@@ -9,7 +9,7 @@ import static seedu.address.commons.util.AppUtil.checkArgument;
  */
 public class Remark {
 
-    public String remark;
+    public String value;
 
     /**
      * Constructs a {@code Remark}.
@@ -18,24 +18,24 @@ public class Remark {
      */
     public Remark(String remark) {
         requireNonNull(remark);
-        this.remark = remark;
+        this.value = remark;
     }
 
     @Override
     public String toString() {
-        return remark;
+        return value;
     }
 
     @Override
     public boolean equals(Object other) {
         return other == this // short circuit if same object
                 || (other instanceof Remark // instanceof handles nulls
-                && this.remark.equals(((Remark) other).remark)); // state check
+                && this.value.equals(((Remark) other).value)); // state check
     }
 
     @Override
     public int hashCode() {
-        return this.remark.hashCode();
+        return this.value.hashCode();
     }
 
 }
