@@ -12,13 +12,15 @@ import static swift.testutil.Assert.assertThrows;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 import swift.commons.core.index.Index;
 import swift.logic.commands.exceptions.CommandException;
 import swift.model.AddressBook;
 import swift.model.Model;
-import swift.model.person.NameContainsKeywordsPredicate;
 import swift.model.person.Person;
+import swift.model.person.PersonNameContainsKeywordsPredicate;
+import swift.model.task.Task;
 import swift.testutil.EditPersonDescriptorBuilder;
 
 /**
@@ -57,8 +59,11 @@ public class CommandTestUtil {
     public static final String PREAMBLE_WHITESPACE = "\t  \r  \n";
     public static final String PREAMBLE_NON_EMPTY = "NonEmptyPreamble";
 
-    public static final EditCommand.EditPersonDescriptor DESC_AMY;
-    public static final EditCommand.EditPersonDescriptor DESC_BOB;
+    public static final EditContactCommand.EditPersonDescriptor DESC_AMY;
+    public static final EditContactCommand.EditPersonDescriptor DESC_BOB;
+
+    public static final String VALID_TASK_NAME_1 = "CS2103T";
+    public static final String VALID_TASK_NAME_2 = "Buy Milk";
 
     static {
         DESC_AMY = new EditPersonDescriptorBuilder().withName(VALID_NAME_AMY)
@@ -120,9 +125,23 @@ public class CommandTestUtil {
 
         Person person = model.getFilteredPersonList().get(targetIndex.getZeroBased());
         final String[] splitName = person.getName().fullName.split("\\s+");
-        model.updateFilteredPersonList(new NameContainsKeywordsPredicate(Arrays.asList(splitName[0])));
+        model.updateFilteredPersonList(new PersonNameContainsKeywordsPredicate(Arrays.asList(splitName[0])));
 
         assertEquals(1, model.getFilteredPersonList().size());
+    }
+
+    /**
+     * Updates {@code model}'s filtered list to show only the task at the given {@code targetIndex} in the
+     * {@code model}'s address book.
+     */
+    public static void showTaskAtIndex(Model model, Index targetIndex) {
+        assertTrue(targetIndex.getZeroBased() < model.getFilteredTaskList().size());
+
+        Task task = model.getFilteredTaskList().get(targetIndex.getZeroBased());
+        Predicate<Task> isSameTask = (t) -> t.equals(task);
+        model.updateFilteredTaskList(isSameTask);
+
+        assertEquals(1, model.getFilteredTaskList().size());
     }
 
 }

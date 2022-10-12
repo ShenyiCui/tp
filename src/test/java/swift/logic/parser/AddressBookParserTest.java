@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static swift.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static swift.commons.core.Messages.MESSAGE_UNKNOWN_COMMAND;
 import static swift.testutil.Assert.assertThrows;
-import static swift.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
+import static swift.testutil.TypicalPersonIndexes.INDEX_FIRST_PERSON;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,21 +13,26 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
-import swift.logic.commands.AddCommand;
+import swift.logic.commands.AddContactCommand;
+import swift.logic.commands.AddTaskCommand;
 import swift.logic.commands.ClearCommand;
 import swift.logic.commands.DeleteCommand;
-import swift.logic.commands.EditCommand;
-import swift.logic.commands.EditCommand.EditPersonDescriptor;
+import swift.logic.commands.EditContactCommand;
+import swift.logic.commands.EditContactCommand.EditPersonDescriptor;
 import swift.logic.commands.ExitCommand;
-import swift.logic.commands.FindCommand;
+import swift.logic.commands.FindContactCommand;
 import swift.logic.commands.HelpCommand;
-import swift.logic.commands.ListCommand;
+import swift.logic.commands.ListContactCommand;
+import swift.logic.commands.ListTaskCommand;
 import swift.logic.parser.exceptions.ParseException;
-import swift.model.person.NameContainsKeywordsPredicate;
 import swift.model.person.Person;
+import swift.model.person.PersonNameContainsKeywordsPredicate;
+import swift.model.task.Task;
 import swift.testutil.EditPersonDescriptorBuilder;
 import swift.testutil.PersonBuilder;
 import swift.testutil.PersonUtil;
+import swift.testutil.TaskBuilder;
+import swift.testutil.TaskUtil;
 
 public class AddressBookParserTest {
 
@@ -36,8 +41,8 @@ public class AddressBookParserTest {
     @Test
     public void parseCommand_add() throws Exception {
         Person person = new PersonBuilder().build();
-        AddCommand command = (AddCommand) parser.parseCommand(PersonUtil.getAddCommand(person));
-        assertEquals(new AddCommand(person), command);
+        AddContactCommand command = (AddContactCommand) parser.parseCommand(PersonUtil.getAddCommand(person));
+        assertEquals(new AddContactCommand(person), command);
     }
 
     @Test
@@ -57,9 +62,9 @@ public class AddressBookParserTest {
     public void parseCommand_edit() throws Exception {
         Person person = new PersonBuilder().build();
         EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder(person).build();
-        EditCommand command = (EditCommand) parser.parseCommand(EditCommand.COMMAND_WORD + " "
+        EditContactCommand command = (EditContactCommand) parser.parseCommand(EditContactCommand.COMMAND_WORD + " "
                 + INDEX_FIRST_PERSON.getOneBased() + " " + PersonUtil.getEditPersonDescriptorDetails(descriptor));
-        assertEquals(new EditCommand(INDEX_FIRST_PERSON, descriptor), command);
+        assertEquals(new EditContactCommand(INDEX_FIRST_PERSON, descriptor), command);
     }
 
     @Test
@@ -71,9 +76,9 @@ public class AddressBookParserTest {
     @Test
     public void parseCommand_find() throws Exception {
         List<String> keywords = Arrays.asList("foo", "bar", "baz");
-        FindCommand command = (FindCommand) parser.parseCommand(
-                FindCommand.COMMAND_WORD + " " + keywords.stream().collect(Collectors.joining(" ")));
-        assertEquals(new FindCommand(new NameContainsKeywordsPredicate(keywords)), command);
+        FindContactCommand command = (FindContactCommand) parser.parseCommand(
+                FindContactCommand.COMMAND_WORD + " " + keywords.stream().collect(Collectors.joining(" ")));
+        assertEquals(new FindContactCommand(new PersonNameContainsKeywordsPredicate(keywords)), command);
     }
 
     @Test
@@ -84,8 +89,21 @@ public class AddressBookParserTest {
 
     @Test
     public void parseCommand_list() throws Exception {
-        assertTrue(parser.parseCommand(ListCommand.COMMAND_WORD) instanceof ListCommand);
-        assertTrue(parser.parseCommand(ListCommand.COMMAND_WORD + " 3") instanceof ListCommand);
+        assertTrue(parser.parseCommand(ListContactCommand.COMMAND_WORD) instanceof ListContactCommand);
+        assertTrue(parser.parseCommand(ListContactCommand.COMMAND_WORD + " 3") instanceof ListContactCommand);
+    }
+
+    @Test
+    public void parseCommand_add_task() throws Exception {
+        Task task = new TaskBuilder().build();
+        AddTaskCommand command = (AddTaskCommand) parser.parseCommand(TaskUtil.getAddTaskCommand(task));
+        assertEquals(new AddTaskCommand(task), command);
+    }
+
+    @Test
+    public void parseCommand_list_task() throws Exception {
+        assertTrue(parser.parseCommand(ListTaskCommand.COMMAND_WORD) instanceof ListTaskCommand);
+        assertTrue(parser.parseCommand(ListTaskCommand.COMMAND_WORD + " 3") instanceof ListTaskCommand);
     }
 
     @Test
