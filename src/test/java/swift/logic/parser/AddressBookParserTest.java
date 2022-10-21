@@ -8,6 +8,7 @@ import static swift.testutil.Assert.assertThrows;
 import static swift.testutil.TypicalPersonIndexes.INDEX_FIRST_PERSON;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import swift.logic.commands.AddContactCommand;
 import swift.logic.commands.AddTaskCommand;
 import swift.logic.commands.ClearCommand;
-import swift.logic.commands.DeleteCommand;
+import swift.logic.commands.DeleteContactCommand;
 import swift.logic.commands.EditContactCommand;
 import swift.logic.commands.EditContactCommand.EditPersonDescriptor;
 import swift.logic.commands.ExitCommand;
@@ -53,9 +54,9 @@ public class AddressBookParserTest {
 
     @Test
     public void parseCommand_delete() throws Exception {
-        DeleteCommand command = (DeleteCommand) parser.parseCommand(
-                DeleteCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased());
-        assertEquals(new DeleteCommand(INDEX_FIRST_PERSON), command);
+        DeleteContactCommand command = (DeleteContactCommand) parser.parseCommand(
+                DeleteContactCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased());
+        assertEquals(new DeleteContactCommand(INDEX_FIRST_PERSON), command);
     }
 
     @Test
@@ -97,7 +98,7 @@ public class AddressBookParserTest {
     public void parseCommand_add_task() throws Exception {
         Task task = new TaskBuilder().build();
         AddTaskCommand command = (AddTaskCommand) parser.parseCommand(TaskUtil.getAddTaskCommand(task));
-        assertEquals(new AddTaskCommand(task), command);
+        assertEquals(new AddTaskCommand(task, new HashSet<>()), command);
     }
 
     @Test
